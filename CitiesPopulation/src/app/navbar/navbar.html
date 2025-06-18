@@ -1,0 +1,17 @@
+<div>
+  <nav>
+    <button (click)="setActiveTab('overview')" 
+            [class.active]="activeTab === 'overview'">
+      Overview
+    </button>
+    <button (click)="setActiveTab('cities')" 
+            [class.active]="activeTab === 'cities'">
+      Cities
+    </button>
+  </nav>
+
+  <div>
+    <app-overview *ngIf="activeTab === 'overview'"></app-overview>
+    <app-cities *ngIf="activeTab === 'cities'"></app-cities>
+  </div>
+</div>
