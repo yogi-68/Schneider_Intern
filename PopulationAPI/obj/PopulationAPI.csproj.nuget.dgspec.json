@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\SC-Project\\PopulationAPI\\PopulationAPI.csproj": {}
+    "C:\\SE-Project\\PopulationAPI\\PopulationAPI.csproj": {}
   },
   "projects": {
-    "C:\\SC-Project\\PopulationAPI\\PopulationAPI.csproj": {
+    "C:\\SE-Project\\PopulationAPI\\PopulationAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\SC-Project\\PopulationAPI\\PopulationAPI.csproj",
+        "projectUniqueName": "C:\\SE-Project\\PopulationAPI\\PopulationAPI.csproj",
         "projectName": "PopulationAPI",
-        "projectPath": "C:\\SC-Project\\PopulationAPI\\PopulationAPI.csproj",
+        "projectPath": "C:\\SE-Project\\PopulationAPI\\PopulationAPI.csproj",
         "packagesPath": "C:\\Users\\SESA826403\\.nuget\\packages\\",
-        "outputPath": "C:\\SC-Project\\PopulationAPI\\obj\\",
+        "outputPath": "C:\\SE-Project\\PopulationAPI\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
