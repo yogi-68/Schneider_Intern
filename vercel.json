@@ -1,7 +1,7 @@
 {
-  "buildCommand": "cd CitiesPopulation && npm ci && npm run build",
+  "buildCommand": "cd CitiesPopulation && npm install && npm run build",
   "outputDirectory": "CitiesPopulation/dist/project/browser",
-  "installCommand": "npm ci",
+  "installCommand": "cd CitiesPopulation && npm install",
   "framework": null,
   "rewrites": [
     {
