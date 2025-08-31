@@ -1,7 +1,8 @@
 {
-  "buildCommand": "cd CitiesPopulation && npm run build",
+  "buildCommand": "cd CitiesPopulation && npm ci && npm run build",
   "outputDirectory": "CitiesPopulation/dist/project/browser",
-  "framework": "angular",
+  "installCommand": "npm ci",
+  "framework": null,
   "rewrites": [
     {
       "source": "/(.*)",
