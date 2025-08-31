@@ -1,0 +1,12 @@
+{
+  "name": "schneider-intern-project",
+  "version": "1.0.0",
+  "description": "Schneider Electric Intern Project - Cities Population Dashboard",
+  "scripts": {
+    "build": "cd CitiesPopulation && npm install && npm run build",
+    "start": "cd CitiesPopulation && npm start"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

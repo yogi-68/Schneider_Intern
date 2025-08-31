@@ -1,0 +1,11 @@
+{
+  "buildCommand": "cd CitiesPopulation && npm run build",
+  "outputDirectory": "CitiesPopulation/dist/project/browser",
+  "framework": "angular",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
