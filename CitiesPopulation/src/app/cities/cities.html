@@ -1,46 +1,148 @@
-<div>
-  <h1>Cities</h1>
-  
-  <div>
-    <input type="text" 
-           [(ngModel)]="searchTerm" 
-           placeholder="Search cities..."
-           [disabled]="loading"
-           (keyup.enter)="onSearch()">
-    <button 
-  (click)="onSearch()" 
-  [disabled]="loading || !searchTerm.trim()">
-  {{ loading ? 'Searching...' : 'Search' }}
-  </button>
-
-    <button (click)="clearSearch()" *ngIf="searched">Clear</button>
-  </div>
-  <!-- Loading indicator -->
-  <div *ngIf="loading">
-    <p>Searching for cities...</p>
+<div class="cities-container">
+  <!-- Navigation Tabs -->
+  <div class="navigation-tabs">
+    <button class="nav-button" [class.active]="currentView === 'search'" (click)="setView('search')">
+      Search City
+    </button>
+    <button class="nav-button" [class.active]="currentView === 'add_update'" (click)="setView('add_update')">
+      Add / Update City
+    </button>
+    <button class="nav-button" [class.active]="currentView === 'all'" (click)="setView('all')">
+      View All / Manage
+    </button>
   </div>
 
-  <!-- Error message -->
-  <div *ngIf="error">
-    <p style="color: red;">{{ error }}</p>
+  <!-- Global Error message -->
+  <div *ngIf="error" class="error-message">
+    <p>{{ error }}</p>
   </div>
 
-  <!-- Search results -->
-  <div *ngIf="cities.length > 0 && !loading">
-    <h2>Search Results ({{ cities.length }} found)</h2>
-    
-    <div *ngFor="let city of cities">
-      <div style="border: 1px solid #ccc; margin: 10px 0; padding: 15px; border-radius: 5px;">
-        <h3>{{ city.city }}</h3>
-        <p><strong>Country:</strong> {{ city.country }}</p>
-        <p><strong>Year:</strong> {{ city.year }}</p>
-        <p><strong>Population:</strong> {{ formatPopulation(city.population) }}</p>
+  <!-- View All / Manage Section -->
+  <div *ngIf="currentView === 'all'" class="all-cities-section">
+    <h2>All City Populations</h2>
+    <div *ngIf="allCitiesLoading" class="loading-spinner">Loading all cities...</div>
+    <div *ngIf="allCitiesError" class="error-message">
+      <p>{{ allCitiesError }}</p>
+    </div>
+    <div *ngIf="allCities.length > 0" class="table-responsive">
+      <table class="cities-table">
+        <thead>
+          <tr>
+            <th>City</th>
+            <th>Country</th>
+            <th>Year</th>
+            <th>Population</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let city of allCities">
+            <td>{{ city.city }}</td>
+            <td>{{ city.country }}</td>
+            <td>{{ city.year }}</td>
+            <td>{{ city.population }}</td>
+            <td>
+              <button (click)="editCity(city)" class="edit-btn">Edit</button>
+              <button (click)="deleteCity(city)" class="delete-btn">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div *ngIf="!allCitiesLoading && !allCitiesError && allCities.length === 0" class="no-results">
+      <p>No cities available in the database.</p>
+    </div>
+
+    <!-- Delete Confirmation Dialog (Modal) -->
+    <div *ngIf="showDeleteConfirmDialog" class="modal-overlay">
+      <div class="modal-content">
+        <p>Are you sure you want to delete {{ cityToDelete?.city }}, {{ cityToDelete?.country }} ({{ cityToDelete?.year }})?</p>
+        <div class="modal-buttons">
+          <button (click)="confirmDeleteAction()" class="confirm-delete-action-btn">Delete</button>
+          <button (click)="cancelDeleteConfirm()" class="cancel-btn">Cancel</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- No results message -->
-  <div *ngIf="cities.length === 0 && !loading && !error && searched">
-    <p>No cities found for "{{ searchTerm }}"</p>
+  <!-- Search Section -->
+  <div *ngIf="currentView === 'search'" class="search-section">
+    <div class="search-input-group">
+      <div class="input-wrapper">
+        <label class="input-label">
+          Search City: <span class="required">*</span>
+        </label>
+        <input type="text" 
+               [(ngModel)]="searchTerm" 
+               [disabled]="loading"
+               (keyup.enter)="onSearch()"
+               class="search-input">
+      </div>
+      <button (click)="onSearch()" 
+              [disabled]="loading || !searchTerm.trim()"
+              class="search-btn">
+              Search for the city
+      </button>
+    </div>
+
+    <!-- Search results -->
+    <div *ngIf="hasResult()" class="results-section">
+      <div class="results-header">
+        <h2 class="results-title">Population Details:</h2>
+      </div>
+      
+        <div class="city-card">
+          <div class="city-details">
+            <p>
+              <strong>City:</strong> 
+              <span>{{ cities!.city }}</span>
+            </p>
+            <p>
+              <strong>Country:</strong> 
+              <span>{{ cities!.country }}</span>
+            </p>
+            <p>
+              <strong>Year:</strong> 
+              <span>{{ cities!.year }}</span>
+            </p>
+            <p>
+              <strong>Value:</strong> 
+              <span class="population-highlight">{{ cities!.population }}</span>
+            </p>
+          </div>
+      </div>
+    </div>
+
+    <!-- No results message -->
+    <div *ngIf="shouldShowNoResults()" class="no-results">
+      <p>No cities found for "{{ searchTerm }}"</p>
+    </div>
+  </div>
+
+  <!-- Add/Update Section -->
+  <div *ngIf="currentView === 'add_update'" class="crud-section">
+    <h2>{{ isEditMode ? 'Update City Population' : 'Add New City Population' }}</h2>
+    <form (ngSubmit)="onAddUpdate()" class="crud-form">
+      <div class="form-group">
+        <label for="city">City:</label>
+        <input type="text" id="city" [(ngModel)]="newCity.city" name="city" required [disabled]="isEditMode">
+      </div>
+      <div class="form-group">
+        <label for="country">Country:</label>
+        <input type="text" id="country" [(ngModel)]="newCity.country" name="country" required [disabled]="isEditMode">
+      </div>
+      <div class="form-group">
+        <label for="year">Year:</label>
+        <input type="number" id="year" [(ngModel)]="newCity.year" name="year" required [disabled]="isEditMode">
+      </div>
+      <div class="form-group">
+        <label for="population">Population:</label>
+        <input type="number" id="population" [(ngModel)]="newCity.population" name="population" required>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="add-btn" [disabled]="loading">{{ isEditMode ? 'Update City' : 'Add City' }}</button>
+        <button type="button" class="cancel-btn" *ngIf="isEditMode" (click)="cancelEdit()">Cancel</button>
+      </div>
+    </form>
   </div>
 </div>

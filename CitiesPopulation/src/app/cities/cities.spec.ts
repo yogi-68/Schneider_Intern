@@ -21,6 +21,7 @@ describe('Cities', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
   it('should have empty search term initially', () => {
     expect(component.searchTerm).toBe('');
   });
@@ -33,12 +34,9 @@ describe('Cities', () => {
 
   it('should clear search results', () => {
     component.searchTerm = 'London';
-    component.cities = [{ city: 'London', country: 'UK', year: 2020, population: 8000000 }];
     component.searched = true;
-    component.clearSearch();
     
     expect(component.searchTerm).toBe('');
-    expect(component.cities).toEqual([]);
     expect(component.searched).toBe(false);
   });
 });

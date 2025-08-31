@@ -12,6 +12,11 @@ import { Navbar } from '../navbar/navbar';
   styleUrl: './dashboard.css'
 })
 export class Dashboard implements OnInit {
+  showDropdown = false;
+
+  toggleDropdown() {
+    this.showDropdown = !this.showDropdown;
+  }
   currentUser: User | null = null;
   constructor(private router: Router, private authService: AuthService) {}
   ngOnInit(): void {
@@ -23,5 +28,6 @@ export class Dashboard implements OnInit {
     console.log('User logged out');
     this.authService.logout();
     this.router.navigate(['/login']);
+    this.showDropdown = false;
   }
 }

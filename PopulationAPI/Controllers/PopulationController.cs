@@ -8,13 +8,28 @@ namespace PopulationAPI.Controllers
     [Route("api/[controller]")]
     public class PopulationController : ControllerBase
     {
-        private readonly IExcelService _excelService;
+        private readonly IDatabaseService _databaseService;
         private readonly ILogger<PopulationController> _logger;
 
-        public PopulationController(IExcelService excelService, ILogger<PopulationController> logger)
+        public PopulationController(IDatabaseService databaseService, ILogger<PopulationController> logger)
         {
-            _excelService = excelService;
+            _databaseService = databaseService;
             _logger = logger;
+        }
+
+        [HttpGet("all")]
+        public async Task<ActionResult<List<CityPopulation>>> GetAllCities()
+        {
+            try
+            {
+                var results = await _databaseService.GetAllCitiesAsync();
+                return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving all cities");
+                return StatusCode(500, "Internal server error occurred");
+            }
         }
 
         [HttpGet("city/{cityName}")]
@@ -27,7 +42,7 @@ namespace PopulationAPI.Controllers
                     return BadRequest("City name cannot be empty");
                 }
 
-                var results = await _excelService.GetCityPopulationAsync(cityName);
+                var results = await _databaseService.GetCityPopulationAsync(cityName);
                 
                 if (!results.Any())
                 {
@@ -48,19 +63,14 @@ namespace PopulationAPI.Controllers
         {
             try
             {
-                if (!ModelState.IsValid)
+                if (!ModelState.IsValid || string.IsNullOrWhiteSpace(request.CityName))
                 {
-                    return BadRequest(ModelState);
+                    return BadRequest("City name is required");
                 }
 
-                var results = await _excelService.GetCityPopulationAsync(request.CityName);
+                var results = await _databaseService.GetCityPopulationAsync(request.CityName);
                 
-                if (!results.Any())
-                {
-                    return NotFound($"No population data found for city: {request.CityName}");
-                }
-
-                return Ok(results);
+                return Ok(results); // Return empty list instead of 404 for no results
             }
             catch (Exception ex)
             {
@@ -69,18 +79,128 @@ namespace PopulationAPI.Controllers
             }
         }
 
-        [HttpGet("reload-data")]
-        public async Task<ActionResult> ReloadData()
+        [HttpGet("initialize-db")]
+        public async Task<ActionResult> InitializeDatabase()
         {
             try
             {
-                await _excelService.LoadExcelDataAsync();
-                return Ok("Data reloaded successfully");
+                await _databaseService.InitializeDatabaseAsync();
+                return Ok("Database initialized successfully");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error reloading Excel data");
-                return StatusCode(500, "Error reloading data");
+                _logger.LogError(ex, "Error initializing database");
+                return StatusCode(500, "Error initializing database");
+            }
+        }
+
+        [HttpGet("countries")]
+        public async Task<ActionResult<List<string>>> GetAllCountries()
+        {
+            try
+            {
+                var countries = await _databaseService.GetAllCountriesAsync();
+                return Ok(countries);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving countries");
+                return StatusCode(500, "Internal server error occurred");
+            }
+        }
+
+        [HttpGet("country/{countryName}")]
+        public async Task<ActionResult<List<CityPopulation>>> GetCitiesByCountry(string countryName)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(countryName))
+                {
+                    return BadRequest("Country name cannot be empty");
+                }
+
+                var results = await _databaseService.GetCitiesByCountryAsync(countryName);
+                return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error retrieving cities for country: {countryName}");
+                return StatusCode(500, "Internal server error occurred");
+            }
+        }
+
+        // New API endpoint to add a city population record
+        [HttpPost("add")]
+        public async Task<ActionResult> AddCityPopulation([FromBody] CityPopulation cityPopulation)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                await _databaseService.AddCityPopulationAsync(cityPopulation);
+                return StatusCode(201, "City population added successfully"); // 201 Created
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Attempted to add duplicate city population record.");
+                return Conflict(ex.Message); // 409 Conflict
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error adding city population");
+                return StatusCode(500, "Internal server error occurred while adding city population");
+            }
+        }
+
+        // New API endpoint to update a city population record
+        [HttpPut("update")]
+        public async Task<ActionResult> UpdateCityPopulation([FromBody] CityPopulation cityPopulation)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                await _databaseService.UpdateCityPopulationAsync(cityPopulation);
+                return Ok("City population updated successfully"); // 200 OK
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogWarning(ex, "Attempted to update non-existent city population record.");
+                return NotFound(ex.Message); // 404 Not Found
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating city population");
+                return StatusCode(500, "Internal server error occurred while updating city population");
+            }
+        }
+
+        // New API endpoint to delete a city population record
+        [HttpDelete("delete/{city}/{country}/{year}")]
+        public async Task<ActionResult> DeleteCityPopulation(string city, string country, int year)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(city) || string.IsNullOrWhiteSpace(country) || year == 0)
+                {
+                    return BadRequest("City, Country, and Year are required for deletion.");
+                }
+                await _databaseService.DeleteCityPopulationAsync(city, country, year);
+                return Ok("City population deleted successfully"); // 200 OK
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogWarning(ex, "Attempted to delete non-existent city population record.");
+                return NotFound(ex.Message); // 404 Not Found
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting city population");
+                return StatusCode(500, "Internal server error occurred while deleting city population");
             }
         }
     }

@@ -14,6 +14,8 @@ export class Login {
   password: string = '';
   isLoading: boolean = false;
   errorMessage: string = '';
+  showError: boolean = false;
+  
   constructor(
     private router: Router,
     private authService: AuthService
@@ -21,25 +23,45 @@ export class Login {
   
   onSubmit() {
     this.errorMessage = '';
+    this.showError = false;
+    
     if (!this.username || !this.password) {
-      this.errorMessage = 'Please enter both username and password';
+      this.showErrorMessage('Please enter both username and password');
       return;
     }
+    
     this.isLoading = true;
-    if (this.username === 'admin' && this.password === 'admin') {
-      console.log('Login successful');
-      this.authService.setAuthState(true);
-      this.router.navigate(['/dashboard']).then(() => {
+    
+    // Use the auth service login method for consistent validation
+    this.authService.login(this.username, this.password).subscribe({
+      next: (success) => {
         this.isLoading = false;
-      });
-    } 
-    else {
-      this.errorMessage = 'Please enter both username and password';
-      console.log('Invalid login attempt:', { 
-        username: this.username, 
-        password: this.password 
-      });
-      this.isLoading = false;
-    }
+        if (success) {
+          console.log('Login successful');
+          // Navigation is handled by the auth service
+        } else {
+          this.showErrorMessage('Invalid login!!!');
+          console.log('Invalid login attempt:', { 
+            username: this.username, 
+            password: this.password 
+          });
+        }
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.showErrorMessage('Login failed. Please try again.');
+        console.error('Login error:', error);
+      }
+    });
+  }
+  
+  private showErrorMessage(message: string) {
+    this.errorMessage = message;
+    this.showError = true;
+    
+    // Auto-hide error message after 5 seconds
+    setTimeout(() => {
+      this.showError = false;
+    }, 5000);
   }
 }

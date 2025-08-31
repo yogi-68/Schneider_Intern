@@ -1,16 +1,18 @@
-<div>
-  <nav>
-    <button (click)="setActiveTab('overview')" 
-            [class.active]="activeTab === 'overview'">
+<div class="navbar-container">
+  <nav class="nav-tabs">
+    <button class="nav-tab" 
+            [class.active]="activeTab === 'overview'"
+            (click)="setActiveTab('overview')">
       Overview
     </button>
-    <button (click)="setActiveTab('cities')" 
-            [class.active]="activeTab === 'cities'">
-      Cities
+    <button class="nav-tab" 
+            [class.active]="activeTab === 'cities'"
+            (click)="setActiveTab('cities')">
+      City
     </button>
   </nav>
-
-  <div>
+  
+  <div class="tab-content">
     <app-overview *ngIf="activeTab === 'overview'"></app-overview>
     <app-cities *ngIf="activeTab === 'cities'"></app-cities>
   </div>

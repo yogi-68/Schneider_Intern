@@ -1,0 +1,64 @@
+.navbar-container {
+  background-color: rgb(33, 176, 74);
+  padding: 0;
+  height: 47.5px;
+  position: relative;
+  user-select: none;
+}
+
+.nav-tabs {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  align-items: center;
+  position: relative;
+}
+
+.nav-tab {
+  background: none;
+  border: none;
+  padding: 15px 30px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  align-items: center;
+}
+
+.nav-tabs::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  height: 2.4px;
+  background-color: white;
+  width: var(--underline-width, 0);
+  left: var(--underline-left, 0);
+  transition: left 0.3s ease, width 0.3s ease;
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.nav-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  right: 0;
+  height: 2.4px;
+  background-color: white;
+  bottom: 0;
+}
+
+.tab-content {
+  background-color: #f8f9fa;
+  min-height: calc(100vh - 120px);
+}
+
+.nav-tab:focus {
+  outline: none;
+}

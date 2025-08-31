@@ -1,10 +1,26 @@
-<div>
-  <h2>Dashboard</h2>
-  <app-navbar></app-navbar>
-  <div class="dashboard-content">
-    
-  </div>
-  <div>
-        <button (click)="logout()">Logout</button>
+<div class="dashboard-container">
+  <header class="header">
+    <div class="title">
+      <span class="app-title">DemoApp</span>
     </div>
+    
+    <div class="right-section">
+      <div class="user-section">
+        <button class="user-dropdown" (click)="toggleDropdown()">
+          <span class="icon">&#128100;</span>admin<span class="icon">&#9662;</span>
+        </button>
+        <div class="dropdown-menu" *ngIf="showDropdown">
+          <button (click)="logout()">Logout</button>
+        </div>
+      </div>
+      
+      <div class="logo-section">
+        <img src="/SE+Logo.png" alt="Schneider Electric" class="logo">
+      </div>
+    </div>
+  </header>
+
+  <div class="dashboard-content">
+    <app-navbar></app-navbar>
+  </div>
 </div>

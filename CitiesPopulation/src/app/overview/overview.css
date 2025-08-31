@@ -1,0 +1,24 @@
+.overview-container {
+  text-align: center;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 8px;
+}
+
+.overview-title {
+  margin-top: 150px;
+  font-size: 32px;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 20px;
+}
+
+.overview-description {
+  font-size: 18px;
+  color: #000000;
+  max-width: 600px;
+  line-height: 1.6;
+  justify-content: left;
+}
