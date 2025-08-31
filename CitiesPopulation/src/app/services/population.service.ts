@@ -3,12 +3,13 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { CityPopulation } from '../models/city-population.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PopulationService {
-  private apiUrl = 'http://localhost:5000/api/population';
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
 
@@ -95,7 +96,7 @@ export class PopulationService {
     } else {
       switch (error.status) {
         case 0:
-          errorMessage = 'Unable to connect to server. Please check if the backend is running.';
+          errorMessage = 'Unable to connect to server. Backend API is not available. Please ensure the backend is deployed and running.';
           break;
         case 404:
           errorMessage = 'Resource not found';
@@ -114,6 +115,8 @@ export class PopulationService {
       }
     }
     
+    console.error('API Error:', errorMessage);
+    console.error('Current API URL:', this.apiUrl);
     return throwError(() => new Error(errorMessage));
   }
 }

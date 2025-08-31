@@ -22,9 +22,13 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularApp", policy =>
     {
-        policy.WithOrigins("http://localhost:4200")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        policy.WithOrigins(
+            "http://localhost:4200",
+            "https://*.vercel.app",
+            "https://your-vercel-app-domain.vercel.app"  // Replace with your actual Vercel URL
+        )
+        .AllowAnyHeader()
+        .AllowAnyMethod();
     });
 });
 
@@ -61,4 +65,6 @@ app.UseCors("AllowAngularApp");
 app.UseAuthorization();
 app.MapControllers();
 
-app.Run("http://localhost:5000"); // Run on HTTP port 5000
+// Use environment variable for port or default to 5000
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+app.Run($"http://0.0.0.0:{port}");
